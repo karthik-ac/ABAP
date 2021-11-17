@@ -1,0 +1,57 @@
+*&---------------------------------------------------------------------*
+*& Report ZKAC_REVERSE_WORDS_STRING
+*&---------------------------------------------------------------------*
+*& Reverse words in a given string
+
+* Given a String p_input, reverse the string without reversing its individual words.
+* Words are separated by space.
+
+*Example
+*Input:
+*S = i.like.this.program.very.much
+*Output: much.very.program.this.like.i
+*Explanation: After reversing the whole
+*string(not individual words), the input
+*string becomes
+*much.very.program.this.like.i
+*&---------------------------------------------------------------------*
+REPORT zkac_reverse_words_string.
+
+PARAMETERS: p_input TYPE string DEFAULT 'I.LOVE.SAP.ABAP'.
+
+DATA(dot) = '.'.
+
+IF strlen( p_input ) = 0.
+  WRITE: |The input string is empty|.
+  RETURN.
+ENDIF.
+
+SPLIT p_input AT dot INTO TABLE DATA(lt_words).
+
+DATA(lv_lines) = lines( lt_words ).
+DATA lv_output TYPE string.
+DATA(i) = lv_lines.
+
+CLEAR lv_output.
+WHILE i > 0.
+
+  READ TABLE lt_words ASSIGNING FIELD-SYMBOL(<lfs_words>) INDEX i.
+  IF sy-subrc EQ 0.
+    IF sy-tabix NE lv_lines.
+      CONCATENATE lv_output <lfs_words> INTO lv_output SEPARATED BY dot.
+    ELSE.
+      CONCATENATE lv_output <lfs_words> INTO lv_output.
+    ENDIF.
+  ENDIF.
+  i -= 1.
+
+ENDWHILE.
+
+IF <lfs_words> IS ASSIGNED.
+  UNASSIGN <lfs_words>.
+ENDIF.
+
+CLEAR: lv_lines, i.
+FREE lt_words.
+
+WRITE: |{ lv_output }|.
